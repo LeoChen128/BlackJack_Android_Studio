@@ -16,14 +16,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.project_2.ui.theme.Project_2Theme
 
-/**
- * Main Activity that initializes the app and sets up navigation.
- */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize DataManager with context to load persisted data
         DataManager.initialize(this)
 
         enableEdgeToEdge()
@@ -40,9 +35,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/**
- * Main composable that sets up navigation between screens.
- */
 @Composable
 fun BlackjackApp() {
     val navController = rememberNavController()

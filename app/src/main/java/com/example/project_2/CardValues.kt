@@ -1,14 +1,5 @@
 package com.example.project_2
-
-/**
- * Base class for card value calculations and drawable resource mapping.
- */
 open class CardValues {
-
-    /**
-     * Get the numeric value of a card.
-     * Aces return 1 (adjusted to 11 in User/Dealer classes).
-     */
     open fun getValue(card: String): Int {
         val space = card.indexOf(" ")
         val special = card.substring(0, space)
@@ -22,20 +13,12 @@ open class CardValues {
         }
     }
 
-    /**
-     * Get the drawable resource ID for a given card.
-     * Card format: "Rank of Suit" (e.g., "Ace of Hearts")
-     * Drawable format:
-     * - Number cards: card_[suit]_[number].png (e.g., card_hearts_02.png)
-     * - Face cards: card_[suit]_[letter].png (e.g., card_hearts_j.png, card_hearts_q.png, card_hearts_k.png)
-     * - Aces: card_[suit]_a.png (e.g., card_hearts_a.png)
-     */
+
     fun getCardDrawable(card: String): Int {
         val parts = card.split(" of ")
         val rank = parts[0]
         val suit = parts[1].lowercase()
 
-        // Convert rank to drawable format
         val rankCode = when (rank) {
             "Ace" -> "a"
             "2" -> "02"

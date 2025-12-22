@@ -11,9 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-/**
- * Start screen where users can view their money and set their wager.
- */
+
 @Composable
 fun StartScreen(navController: NavController) {
     val context = LocalContext.current
@@ -27,7 +25,7 @@ fun StartScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Title
+
         Text(
             text = "BLACKJACK",
             fontSize = 32.sp,
@@ -36,7 +34,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Money display
         Text(
             text = "Your Money",
             fontSize = 18.sp
@@ -49,7 +46,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Wager display
         Text(
             text = "Wager Amount",
             fontSize = 18.sp
@@ -62,7 +58,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Wager adjustment buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -95,7 +90,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Play button
         Button(
             onClick = {
                 DataManager.setCurrentWager(wager)
@@ -114,7 +108,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Reset button
         TextButton(
             onClick = {
                 DataManager.resetMoney(context)

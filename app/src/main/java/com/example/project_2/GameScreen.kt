@@ -18,9 +18,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 
-/**
- * Game screen where the Blackjack game is played.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(navController: NavController) {
@@ -28,10 +25,10 @@ fun GameScreen(navController: NavController) {
     var gameState by remember { mutableStateOf(initializeGame()) }
     var showDealerCard by remember { mutableStateOf(false) }
     var gameMessage by remember { mutableStateOf("") }
+    var updateTrigger by remember { mutableIntStateOf(0) }
     val wager = DataManager.getCurrentWager()
     val cardValues = remember { CardValues() }
 
-    // Handle game result and update money
     LaunchedEffect(gameState.gameResult) {
         if (gameState.gameResult != GameResult.ONGOING) {
             showDealerCard = true
@@ -53,7 +50,6 @@ fun GameScreen(navController: NavController) {
                 }
                 GameResult.TIE -> {
                     gameMessage = "Push! Your wager is returned."
-                    // Return the wager only (no profit)
                     DataManager.addMoney(wager, context)
                 }
                 GameResult.USER_BUST -> {
@@ -88,7 +84,6 @@ fun GameScreen(navController: NavController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Money and Wager display
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -120,7 +115,6 @@ fun GameScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Dealer's cards
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy((-40).dp)
             ) {
@@ -158,16 +152,21 @@ fun GameScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // User's cards
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy((-40).dp)
-            ) {
-                items(gameState.user.hand) { card ->
-                    card?.let {
-                        Image(
-                            painter = painterResource(id = cardValues.getCardDrawable(it)),
-                            contentDescription = it,
-                            modifier = Modifier.size(width = 80.dp, height = 120.dp)
-                        )
+            key(updateTrigger) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy((-40).dp)
+                ) {
+                    items(
+                        count = gameState.user.hand.size,
+                        key = { index -> "${gameState.user.hand[index]}_${index}_$updateTrigger" }
+                    ) { index ->
+                        gameState.user.hand[index]?.let { card ->
+                            Image(
+                                painter = painterResource(id = cardValues.getCardDrawable(card)),
+                                contentDescription = card,
+                                modifier = Modifier.size(width = 80.dp, height = 120.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -194,6 +193,7 @@ fun GameScreen(navController: NavController) {
                     Button(
                         onClick = {
                             gameState = handleHit(gameState)
+                            updateTrigger++
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -207,6 +207,7 @@ fun GameScreen(navController: NavController) {
                         onClick = {
                             showDealerCard = true
                             gameState = handleStand(gameState)
+                            updateTrigger++
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -222,6 +223,7 @@ fun GameScreen(navController: NavController) {
                         gameState = initializeGame()
                         showDealerCard = false
                         gameMessage = ""
+                        updateTrigger = 0
                         DataManager.subtractMoney(wager, context)
                     },
                     modifier = Modifier
@@ -244,9 +246,6 @@ fun GameScreen(navController: NavController) {
     }
 }
 
-/**
- * Initialize a new game with fresh deck and initial card deals.
- */
 private fun initializeGame(): GameState {
     val deck = Deck()
     val user = User()
@@ -273,9 +272,6 @@ private fun initializeGame(): GameState {
     )
 }
 
-/**
- * Handle the user hitting (drawing another card).
- */
 private fun handleHit(state: GameState): GameState {
     state.user.drawCard(state.deck)
 
@@ -293,11 +289,7 @@ private fun handleHit(state: GameState): GameState {
     }
 }
 
-/**
- * Handle the user standing (ending their turn).
- */
 private fun handleStand(state: GameState): GameState {
-    // Dealer plays according to rules
     state.dealer.rules(state.deck)
 
     val gameResult = when {

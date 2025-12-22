@@ -13,9 +13,6 @@ data class GameState(
     val showDealerCard: Boolean = false
 )
 
-/**
- * Enum representing all possible game outcomes.
- */
 enum class GameResult {
     ONGOING,
     USER_BLACKJACK,
