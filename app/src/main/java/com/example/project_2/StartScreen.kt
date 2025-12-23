@@ -32,10 +32,10 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = "Your Money",
-            fontSize = 18.sp
-        )
+//        Text(
+//            text = "Your Money",
+//            fontSize = 18.sp
+//        )
         Text(
             text = "$$usermoney",
             fontSize = 48.sp,
@@ -45,8 +45,9 @@ fun StartScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Wager Amount",
-            fontSize = 18.sp
+            text = "Wager Amount:",
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold
         )
         Text(
             text = "$$wager",
@@ -104,15 +105,15 @@ fun StartScreen(navController: NavController) {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextButton(
-            onClick = {
-                DataManager.resetmoney(context)
-                usermoney = DataManager.getusermoney()
-            }
-        ) {
-            Text("Reset Money")
-        }
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        TextButton(
+//            onClick = {
+//                DataManager.resetmoney(context)
+//                usermoney = DataManager.getusermoney()
+//            }
+//        ) {
+//            Text("Reset Money")
+//        }
     }
 }
