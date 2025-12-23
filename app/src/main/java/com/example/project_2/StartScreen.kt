@@ -11,11 +11,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-
 @Composable
 fun StartScreen(navController: NavController) {
     val context = LocalContext.current
-    var userMoney by remember { mutableIntStateOf(DataManager.getUserMoney()) }
+    var usermoney by remember { mutableIntStateOf(DataManager.getusermoney()) }
     var wager by remember { mutableIntStateOf(10) }
 
     Column(
@@ -25,7 +24,6 @@ fun StartScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         Text(
             text = "BLACKJACK",
             fontSize = 32.sp,
@@ -39,7 +37,7 @@ fun StartScreen(navController: NavController) {
             fontSize = 18.sp
         )
         Text(
-            text = "$$userMoney",
+            text = "$$usermoney",
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold
         )
@@ -66,7 +64,7 @@ fun StartScreen(navController: NavController) {
             Button(
                 onClick = {
                     if (wager >= 10) {
-                        wager -= 10
+                        wager = wager - 10
                     }
                 },
                 enabled = wager > 10
@@ -78,11 +76,11 @@ fun StartScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    if (wager + 10 <= userMoney) {
-                        wager += 10
+                    if (wager + 10 <= usermoney) {
+                        wager = wager + 10
                     }
                 },
-                enabled = wager + 10 <= userMoney
+                enabled = wager + 10 <= usermoney
             ) {
                 Text("+10")
             }
@@ -92,13 +90,13 @@ fun StartScreen(navController: NavController) {
 
         Button(
             onClick = {
-                DataManager.setCurrentWager(wager)
+                DataManager.setcurrentwager(wager)
                 navController.navigate("game")
             },
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .height(56.dp),
-            enabled = wager <= userMoney && wager > 0
+            enabled = wager <= usermoney && wager > 0
         ) {
             Text(
                 text = "PLAY",
@@ -110,8 +108,8 @@ fun StartScreen(navController: NavController) {
 
         TextButton(
             onClick = {
-                DataManager.resetMoney(context)
-                userMoney = DataManager.getUserMoney()
+                DataManager.resetmoney(context)
+                usermoney = DataManager.getusermoney()
             }
         ) {
             Text("Reset Money")

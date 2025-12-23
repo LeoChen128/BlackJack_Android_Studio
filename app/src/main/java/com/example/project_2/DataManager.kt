@@ -4,54 +4,59 @@ import android.content.Context
 import android.content.SharedPreferences
 
 object DataManager {
-    private const val PREFS_NAME = "BlackjackPrefs"
-    private const val MONEY = "user_money"
-    private const val DEFAULT_MONEY = 1000
+    private const val prefsname = "BlackjackPrefs"
+    private const val keyusermoney = "user_money"
+    private const val defaultmoney = 1000
 
-    private var userMoney: Int = DEFAULT_MONEY
-    private var currentWager: Int = 0
-
+    private var usermoney: Int = defaultmoney
+    private var currentwager: Int = 0
 
     fun initialize(context: Context) {
-        val prefs = getPreferences(context)
-        userMoney = prefs.getInt(MONEY, DEFAULT_MONEY)
+        val prefs = context.getSharedPreferences(prefsname, Context.MODE_PRIVATE)
+        usermoney = prefs.getInt(keyusermoney, defaultmoney)
     }
 
-    fun getUserMoney(): Int = userMoney
-
-    fun setUserMoney(amount: Int, context: Context) {
-        userMoney = amount
-        saveToPreferences(context)
+    fun getusermoney(): Int {
+        return usermoney
     }
 
-    fun addMoney(amount: Int, context: Context) {
-        userMoney += amount
-        saveToPreferences(context)
+    fun setusermoney(amount: Int, context: Context) {
+        usermoney = amount
+        val prefs = context.getSharedPreferences(prefsname, Context.MODE_PRIVATE)
+        prefs.edit().putInt(keyusermoney, usermoney).apply()
     }
 
-    fun subtractMoney(amount: Int, context: Context) {
-        userMoney -= amount
-        saveToPreferences(context)
+    fun addmoney(amount: Int, context: Context) {
+        usermoney = usermoney + amount
+        val prefs = context.getSharedPreferences(prefsname, Context.MODE_PRIVATE)
+        prefs.edit().putInt(keyusermoney, usermoney).apply()
     }
 
-    fun getCurrentWager(): Int = currentWager
-
-    fun setCurrentWager(amount: Int) {
-        currentWager = amount
+    fun subtractmoney(amount: Int, context: Context) {
+        usermoney = usermoney - amount
+        val prefs = context.getSharedPreferences(prefsname, Context.MODE_PRIVATE)
+        prefs.edit().putInt(keyusermoney, usermoney).apply()
     }
 
-    fun canAffordWager(amount: Int): Boolean = amount <= userMoney
-
-    fun getPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    fun getcurrentwager(): Int {
+        return currentwager
     }
 
-    fun saveToPreferences(context: Context) {
-        val prefs = getPreferences(context)
-        prefs.edit().putInt(MONEY, userMoney).apply()
+    fun setcurrentwager(amount: Int) {
+        currentwager = amount
     }
 
-    fun resetMoney(context: Context) {
-        setUserMoney(DEFAULT_MONEY, context)
+    fun canaffordwager(amount: Int): Boolean {
+        if (amount <= usermoney) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun resetmoney(context: Context) {
+        usermoney = defaultmoney
+        val prefs = context.getSharedPreferences(prefsname, Context.MODE_PRIVATE)
+        prefs.edit().putInt(keyusermoney, usermoney).apply()
     }
 }

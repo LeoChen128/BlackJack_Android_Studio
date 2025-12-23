@@ -3,7 +3,6 @@ package com.example.project_2
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -22,45 +21,42 @@ import kotlinx.coroutines.delay
 @Composable
 fun GameScreen(navController: NavController) {
     val context = LocalContext.current
-    var gameState by remember { mutableStateOf(initializeGame()) }
-    var showDealerCard by remember { mutableStateOf(false) }
-    var gameMessage by remember { mutableStateOf("") }
-    var updateTrigger by remember { mutableIntStateOf(0) }
-    val wager = DataManager.getCurrentWager()
-    val cardValues = remember { CardValues() }
+    var gamestate by remember { mutableStateOf(initializegame()) }
+    var showdealercard by remember { mutableStateOf(false) }
+    var gamemessage by remember { mutableStateOf("") }
+    var updatetrigger by remember { mutableIntStateOf(0) }
+    val wager = DataManager.getcurrentwager()
+    val cardvalues = remember { CardValues() }
 
-    LaunchedEffect(gameState.gameResult) {
-        if (gameState.gameResult != GameResult.ONGOING) {
-            showDealerCard = true
+    LaunchedEffect(gamestate.gameresult) {
+        if (gamestate.gameresult != GameResult.ONGOING) {
+            showdealercard = true
             delay(500)
 
-            when (gameState.gameResult) {
-                GameResult.USER_BLACKJACK -> {
-                    val winnings = (wager * 2.5).toInt()
-                    gameMessage = "BLACKJACK! You win $$winnings!"
-                    DataManager.addMoney(winnings, context)
-                }
-                GameResult.USER_WIN -> {
-                    val winnings = wager * 2
-                    gameMessage = "You win $$winnings!"
-                    DataManager.addMoney(winnings, context)
-                }
-                GameResult.DEALER_WIN -> {
-                    gameMessage = "Dealer wins. You lose $$wager."
-                }
-                GameResult.TIE -> {
-                    gameMessage = "Push! Your wager is returned."
-                    DataManager.addMoney(wager, context)
-                }
-                GameResult.USER_BUST -> {
-                    gameMessage = "Bust! You lose $$wager."
-                }
-                GameResult.DEALER_BUST -> {
-                    val winnings = wager * 2
-                    gameMessage = "Dealer busts! You win $$winnings!"
-                    DataManager.addMoney(winnings, context)
-                }
-                GameResult.ONGOING -> {}
+            if (gamestate.gameresult == GameResult.USER_BLACKJACK) {
+                val winnings = (wager * 2.5).toInt()
+                gamemessage = "BLACKJACK! You win $$winnings!"
+                DataManager.addmoney(winnings, context)
+            }
+            if (gamestate.gameresult == GameResult.USER_WIN) {
+                val winnings = wager * 2
+                gamemessage = "You win $$winnings!"
+                DataManager.addmoney(winnings, context)
+            }
+            if (gamestate.gameresult == GameResult.DEALER_WIN) {
+                gamemessage = "Dealer wins. You lose $$wager."
+            }
+            if (gamestate.gameresult == GameResult.TIE) {
+                gamemessage = "Push! Your wager is returned."
+                DataManager.addmoney(wager, context)
+            }
+            if (gamestate.gameresult == GameResult.USER_BUST) {
+                gamemessage = "Bust! You lose $$wager."
+            }
+            if (gamestate.gameresult == GameResult.DEALER_BUST) {
+                val winnings = wager * 2
+                gamemessage = "Dealer busts! You win $$winnings!"
+                DataManager.addmoney(winnings, context)
             }
         }
     }
@@ -89,7 +85,7 @@ fun GameScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Money: $${DataManager.getUserMoney()}",
+                    text = "Money: $${DataManager.getusermoney()}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -102,34 +98,44 @@ fun GameScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Dealer section
             Text(
                 text = "Dealer",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = if (showDealerCard) "Score: ${gameState.dealer.score}" else "Score: ?",
-                fontSize = 14.sp
-            )
+
+            if (showdealercard) {
+                Text(
+                    text = "Score: ${gamestate.dealer.score}",
+                    fontSize = 14.sp
+                )
+            } else {
+                Text(
+                    text = "Score: ?",
+                    fontSize = 14.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy((-40).dp)
             ) {
-                items(gameState.dealer.hand) { card ->
-                    card?.let {
-                        val isSecondCard = gameState.dealer.hand.indexOf(card) == 1
-                        val drawable = if (!showDealerCard && isSecondCard) {
-                            R.drawable.card_back
+                items(gamestate.dealer.hand.size) { index ->
+                    val card = gamestate.dealer.hand[index]
+                    if (card != null) {
+                        val issecondcard = index == 1
+                        var drawable = 0
+
+                        if (!showdealercard && issecondcard) {
+                            drawable = R.drawable.card_back
                         } else {
-                            cardValues.getCardDrawable(it)
+                            drawable = cardvalues.getcarddrawable(card)
                         }
 
                         Image(
                             painter = painterResource(id = drawable),
-                            contentDescription = if (!showDealerCard && isSecondCard) "Hidden card" else it,
+                            contentDescription = card,
                             modifier = Modifier.size(width = 80.dp, height = 120.dp)
                         )
                     }
@@ -138,31 +144,31 @@ fun GameScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // User section
             Text(
                 text = "Your Hand",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Score: ${gameState.user.score}",
+                text = "Score: ${gamestate.user.score}",
                 fontSize = 14.sp
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // User's cards
-            key(updateTrigger) {
+            key(updatetrigger) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy((-40).dp)
                 ) {
                     items(
-                        count = gameState.user.hand.size,
-                        key = { index -> "${gameState.user.hand[index]}_${index}_$updateTrigger" }
+                        count = gamestate.user.hand.size,
+                        key = { index -> "${gamestate.user.hand[index]}_${index}_$updatetrigger" }
                     ) { index ->
-                        gameState.user.hand[index]?.let { card ->
+                        val card = gamestate.user.hand[index]
+                        if (card != null) {
+                            val drawable = cardvalues.getcarddrawable(card)
                             Image(
-                                painter = painterResource(id = cardValues.getCardDrawable(card)),
+                                painter = painterResource(id = drawable),
                                 contentDescription = card,
                                 modifier = Modifier.size(width = 80.dp, height = 120.dp)
                             )
@@ -173,10 +179,9 @@ fun GameScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Game message
-            if (gameMessage.isNotEmpty()) {
+            if (gamemessage.isNotEmpty()) {
                 Text(
-                    text = gameMessage,
+                    text = gamemessage,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -184,35 +189,34 @@ fun GameScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Action buttons
-            if (gameState.gameResult == GameResult.ONGOING) {
+            if (gamestate.gameresult == GameResult.ONGOING) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Button(
                         onClick = {
-                            gameState = handleHit(gameState)
-                            updateTrigger++
+                            gamestate = handlehit(gamestate)
+                            updatetrigger = updatetrigger + 1
                         },
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp),
-                        enabled = gameState.isUserTurn && gameState.user.score < 21
+                        enabled = gamestate.isuserturn && gamestate.user.score < 21
                     ) {
                         Text("HIT", fontSize = 18.sp)
                     }
 
                     Button(
                         onClick = {
-                            showDealerCard = true
-                            gameState = handleStand(gameState)
-                            updateTrigger++
+                            showdealercard = true
+                            gamestate = handlestand(gamestate)
+                            updatetrigger = updatetrigger + 1
                         },
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp),
-                        enabled = gameState.isUserTurn
+                        enabled = gamestate.isuserturn
                     ) {
                         Text("STAND", fontSize = 18.sp)
                     }
@@ -220,16 +224,16 @@ fun GameScreen(navController: NavController) {
             } else {
                 Button(
                     onClick = {
-                        gameState = initializeGame()
-                        showDealerCard = false
-                        gameMessage = ""
-                        updateTrigger = 0
-                        DataManager.subtractMoney(wager, context)
+                        gamestate = initializegame()
+                        showdealercard = false
+                        gamemessage = ""
+                        updatetrigger = 0
+                        DataManager.subtractmoney(wager, context)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    enabled = DataManager.canAffordWager(wager)
+                    enabled = DataManager.canaffordwager(wager)
                 ) {
                     Text("NEW GAME", fontSize = 18.sp)
                 }
@@ -246,63 +250,81 @@ fun GameScreen(navController: NavController) {
     }
 }
 
-private fun initializeGame(): GameState {
+fun initializegame(): GameState {
     val deck = Deck()
     val user = User()
     val dealer = Dealer()
 
-    user.drawInitialCards(deck)
-    dealer.drawInitialCards(deck)
+    user.drawinitialcards(deck)
+    dealer.drawinitialcards(deck)
 
-    val gameResult = when {
-        user.hasBlackjack() && !dealer.hasBlackjack() -> GameResult.USER_BLACKJACK
-        user.hasBlackjack() && dealer.hasBlackjack() -> GameResult.TIE
-        dealer.hasBlackjack() -> GameResult.DEALER_WIN
-        else -> GameResult.ONGOING
+    var gameresult = GameResult.ONGOING
+
+    if (user.hasblackjack() && !dealer.hasblackjack()) {
+        gameresult = GameResult.USER_BLACKJACK
+    }
+    if (user.hasblackjack() && dealer.hasblackjack()) {
+        gameresult = GameResult.TIE
+    }
+    if (dealer.hasblackjack() && !user.hasblackjack()) {
+        gameresult = GameResult.DEALER_WIN
     }
 
-    return GameState(
+    val newgame = GameState(
         deck = deck,
         user = user,
         dealer = dealer,
-        isUserTurn = gameResult == GameResult.ONGOING,
-        isGameActive = gameResult == GameResult.ONGOING,
-        gameResult = gameResult,
-        showDealerCard = gameResult != GameResult.ONGOING
+        isuserturn = gameresult == GameResult.ONGOING,
+        isgameactive = gameresult == GameResult.ONGOING,
+        gameresult = gameresult,
+        showdealercard = gameresult != GameResult.ONGOING
     )
+
+    return newgame
 }
 
-private fun handleHit(state: GameState): GameState {
-    state.user.drawCard(state.deck)
+fun handlehit(state: GameState): GameState {
+    state.user.drawcard(state.deck)
 
-    return if (state.user.over21()) {
-        state.copy(
-            isUserTurn = false,
-            isGameActive = false,
-            gameResult = GameResult.USER_BUST,
-            showDealerCard = true
+    if (state.user.over21()) {
+        val newstate = state.copy(
+            isuserturn = false,
+            isgameactive = false,
+            gameresult = GameResult.USER_BUST,
+            showdealercard = true
         )
-    } else if (state.user.score == 21) {
-        handleStand(state)
-    } else {
-        state
+        return newstate
     }
+
+    if (state.user.score == 21) {
+        val newstate = handlestand(state)
+        return newstate
+    }
+
+    return state
 }
 
-private fun handleStand(state: GameState): GameState {
+fun handlestand(state: GameState): GameState {
     state.dealer.rules(state.deck)
 
-    val gameResult = when {
-        state.dealer.over21() -> GameResult.DEALER_BUST
-        state.dealer.score > state.user.score -> GameResult.DEALER_WIN
-        state.dealer.score < state.user.score -> GameResult.USER_WIN
-        else -> GameResult.TIE
+    var gameresult = GameResult.TIE
+
+    if (state.dealer.over21()) {
+        gameresult = GameResult.DEALER_BUST
+    } else if (state.dealer.score > state.user.score) {
+        gameresult = GameResult.DEALER_WIN
+    } else if (state.dealer.score < state.user.score) {
+        gameresult = GameResult.USER_WIN
+    } else {
+        gameresult = GameResult.TIE
     }
 
-    return state.copy(
-        isUserTurn = false,
-        isGameActive = false,
-        gameResult = gameResult,
-        showDealerCard = true
+    val newstate = state.copy(
+        isuserturn = false,
+        isgameactive = false,
+        gameresult = gameresult,
+        showdealercard = true
     )
+
+    return newstate
 }
